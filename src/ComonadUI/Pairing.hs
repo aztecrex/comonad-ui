@@ -7,34 +7,39 @@ type Pairing f g = forall a b. f (a -> b) -> g a -> b
 
 newtype Co w a = Co { runCo :: forall r. w (a -> r) -> r }
 
+instance Functor w => Functor (Co w) where
+    fmap f (Co w) = Co (w . fmap (. f))
+
+instance Comonad w => Monad (Co w) where
+    return a = Co $ \w -> extract w a
+    Co k >>= f = Co (k . extend (\wa a -> runCo (f a) wa))
+
+instance Comonad w => Applicative (Co w) where
+    mf <*> ma = mf >>= \f -> fmap f ma
+    pure a = Co (`extract` a)
+
 pairCo :: Pairing f (Co f)
 pairCo f cof = runCo cof f
 
--- type State s = Co (Store s)
 
-type State s a = s -> (a, s)
-
-get' :: State s s
-get' s = (s,s)
-
-put' :: s -> State s ()
-put' s = const ((), s)
-
-
-type Str s a = (s -> a, s)
-
-get :: Co (Store s) s
-get = Co $ \w -> extract w (pos w)
-
-state :: (s -> (a,s)) -> Co (Store s) a
-state f = Co $ \w -> let (a,s) = f (pos w) in peek s w a
 
 runState :: Co (Store s) a -> s -> (a, s)
 runState m s = runCo m (store (\s' a -> (a, s')) s)
 
--- state :: (s -> (a, s)) -> Co (Store s) a
--- state f = Co $ \st -> extract st
+state :: (s -> (a,s)) -> Co (Store s) a
+state f = Co $ \w -> let (a,s) = f (pos w) in peek s w a
+
+get :: Co (Store s) s
+get = Co $ \w -> extract w (pos w)
 
 put :: s -> Co (Store s) ()
 put s = Co $ \w -> peek s w ()
 
+
+sf :: Co (Store Integer) [Char]
+sf = do
+    a <- state (\s -> (s + 1, s))
+    b <- fmap (a +) get
+    put =<< fmap succ get
+    let c = show b
+    pure $ "answer: " ++ c
