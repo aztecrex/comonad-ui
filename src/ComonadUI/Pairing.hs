@@ -33,8 +33,7 @@ get :: Co (Store s) s
 get = Co $ \w -> extract w (pos w)
 
 put :: s -> Co (Store s) ()
-put s = Co $ \w -> peek s w ()
-
+put s = state $ const ((), s)
 
 sf :: Co (Store Integer) [Char]
 sf = do
