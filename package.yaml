@@ -1,0 +1,77 @@
+name:                comonad-ui
+version:             0.1.0.0
+github:              "aztecrex/comonad-ui"
+license:             BSD3
+author:              "Greg Wiley"
+maintainer:          "aztec.rex@jammm.com"
+copyright:           "2018 Greg Wiley"
+
+extra-source-files:
+- README.md
+
+description:  See <https://github.com/aztecrex/comonad-ui#readme>
+
+
+ghc-options:
+  - -Wall
+
+dependencies:
+  - base >= 4.7 && < 5
+  - comonad
+  - text
+  - transformers
+
+library:
+  source-dirs: src
+
+executables:
+  comonad-ui-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - comonad-ui
+
+tests:
+  comonad-ui-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - comonad-ui
+    - tasty
+    - tasty-hunit
+
+default-extensions:
+  - ConstraintKinds
+  - DataKinds
+  - DefaultSignatures
+  - DeriveAnyClass
+  - DeriveFunctor
+  - DeriveGeneric
+  - ExistentialQuantification
+  - FlexibleContexts
+  - FlexibleInstances
+  - FunctionalDependencies
+  - GADTs
+  - MonoLocalBinds
+  - GeneralizedNewtypeDeriving
+  - KindSignatures
+  - LambdaCase
+  - MultiParamTypeClasses
+  - NamedFieldPuns
+  - OverloadedStrings
+  - RankNTypes
+  - ScopedTypeVariables
+  - StandaloneDeriving
+  - TupleSections
+  - TypeApplications
+  - TypeOperators
+  - TypeFamilies
+
