@@ -3,7 +3,7 @@ module ComonadUI.Pairing where
 import Control.Comonad
 import Control.Comonad.Trans.Store
 
-type Pairing f g = forall a b. f (a -> b) -> g a -> b
+type Pairing f g = forall a b c. (a -> b -> c) -> f a -> g b -> c
 
 newtype Co w a = Co { runCo :: forall r. w (a -> r) -> r }
 
@@ -18,9 +18,11 @@ instance Comonad w => Applicative (Co w) where
     mf <*> ma = mf >>= \f -> fmap f ma
     pure a = Co (`extract` a)
 
-pairCo :: Pairing f (Co f)
-pairCo f cof = runCo cof f
+pairCo :: Functor f => Pairing f (Co f)
+pairCo f w cow = runCo cow (fmap f w)
 
+pairCoOp :: Functor f => Pairing (Co f) f
+pairCoOp f cow w = pairCo (flip f) w cow
 
 
 runState :: Co (Store s) a -> s -> (a, s)
@@ -42,3 +44,5 @@ sf = do
     put =<< fmap succ get
     let c = show b
     pure $ "answer: " ++ c
+
+
