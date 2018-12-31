@@ -49,7 +49,7 @@ sf = do
 -- applies a monadic transition ( Co w ) to a current state,
 -- resulting in a new state
 select :: forall w a b. (Functor w) => Co w b -> w (w a) -> w a
-select ac co = pairCoOp (const id) ac co
+select transition current = pairCoOp (const id) transition current
 
 
 type UI = String
