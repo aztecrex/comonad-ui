@@ -46,7 +46,8 @@ sf = do
     pure $ "answer: " ++ c
 
 
--- selects a particular focus in w using (Co w)
+-- applies a monadic transition ( Co w ) to a current state,
+-- resulting in a new state
 select :: forall w a b. (Functor w) => Co w b -> w (w a) -> w a
 select ac co = pairCoOp (const id) ac co
 
@@ -54,9 +55,19 @@ select ac co = pairCoOp (const id) ac co
 type UI = String
 type S = Integer
 
+-- Store and Co Store provide a (most?) general model
+-- of UI. It is roughly comparable to React (I think).
+-- I believe these can compose via Product and Sum.
+-- Hierarchy can be modeled as Comonad Transformer but
+-- I am not really happy about that because I expect it
+-- results in a static hierarchy encoded in the source.
+-- I'd like to explore alternatives to represent
+-- sub-component composition. Is there some kind of
+-- Comonadic tree structure (zipper-like thing) that could
+-- compose other Comonads? With Product and Sum, we could
+-- certainly build a tree, maybe that would work.
 type Component = Store S
 type Action = Co (Store S)
-
 
 
 c1 :: Component UI
@@ -74,4 +85,4 @@ c2 :: Component UI
 c2 = select a1 (duplicate c1)
 
 c3 :: Component UI
-c3 = select a0 (duplicate c1) -- expecting "v:"
+c3 = select a0 (duplicate c1)
