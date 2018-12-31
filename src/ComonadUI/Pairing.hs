@@ -45,12 +45,11 @@ sf = do
     let c = show b
     pure $ "answer: " ++ c
 
-anh :: forall f g a b. ( ((a -> b) -> a -> b) -> f (a -> b) -> g a -> b ) -> f (a -> b) -> g a -> b
-anh = ($ id)
 
-
-select :: forall s a b. Co (Store s) b -> Store s (Store s a) -> Store s a
+-- selects a particular focus in w using (Co w)
+select :: forall w a b. (Functor w) => Co w b -> w (w a) -> w a
 select ac co = pairCoOp (const id) ac co
+
 
 type UI = String
 type S = Integer
