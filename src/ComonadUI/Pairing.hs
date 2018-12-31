@@ -45,4 +45,32 @@ sf = do
     let c = show b
     pure $ "answer: " ++ c
 
+anh :: forall f g a b. ( ((a -> b) -> a -> b) -> f (a -> b) -> g a -> b ) -> f (a -> b) -> g a -> b
+anh = ($ id)
 
+select' :: ((b -> w a -> w a) -> m b -> w (w a) -> w a) -> m b -> w (w a) -> w a
+select' p = p (\_ wa -> wa)
+
+select :: (Comonad w) => m b -> w (w a) -> w a
+select = (const extract)
+
+type UI = String
+type S = Integer
+
+type Component = Store S UI
+type Action = Co (Store S) ()
+
+c1 :: Component
+c1 = store (("c1:" ++ ) . show) 100
+
+a0 :: Action
+a0 = put 900
+
+a1 :: Action
+a1 = get >>= (\s -> put (s + 10))
+
+c2 :: Component
+c2 = select a1 (duplicate c1)
+
+c3 :: Component
+c3 = select a0 (duplicate c1)
