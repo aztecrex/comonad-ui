@@ -48,29 +48,31 @@ sf = do
 anh :: forall f g a b. ( ((a -> b) -> a -> b) -> f (a -> b) -> g a -> b ) -> f (a -> b) -> g a -> b
 anh = ($ id)
 
-select' :: ((b -> w a -> w a) -> m b -> w (w a) -> w a) -> m b -> w (w a) -> w a
-select' p = p (\_ wa -> wa)
 
-select :: (Comonad w) => m b -> w (w a) -> w a
-select = (const extract)
+select :: forall s a b. Co (Store s) b -> Store s (Store s a) -> Store s a
+select ac co = pairCoOp (const id) ac co
 
 type UI = String
 type S = Integer
 
-type Component = Store S UI
-type Action = Co (Store S) ()
+type Component = Store S
+type Action = Co (Store S)
 
-c1 :: Component
-c1 = store (("c1:" ++ ) . show) 100
 
-a0 :: Action
+
+c1 :: Component UI
+c1 = store (("v:" ++ ) . show) 100
+
+a0 :: Action ()
 a0 = put 900
 
-a1 :: Action
+a1 :: Action ()
 a1 = get >>= (\s -> put (s + 10))
 
-c2 :: Component
+
+
+c2 :: Component UI
 c2 = select a1 (duplicate c1)
 
-c3 :: Component
-c3 = select a0 (duplicate c1)
+c3 :: Component UI
+c3 = select a0 (duplicate c1) -- expecting "v:"
