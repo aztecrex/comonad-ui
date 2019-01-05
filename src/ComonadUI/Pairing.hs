@@ -37,6 +37,9 @@ get = Co $ \w -> extract w (pos w)
 put :: s -> Co (Store s) ()
 put s = state $ const ((), s)
 
+update :: (s -> s) -> Co (Store s) ()
+update = (get >>=) . (put .)
+
 sf :: Co (Store Integer) [Char]
 sf = do
     a <- state (\s -> (s + 1, s))
@@ -62,10 +65,7 @@ type S = Integer
 -- I am not really happy about that because I expect it
 -- results in a static hierarchy encoded in the source.
 -- I'd like to explore alternatives to represent
--- sub-component composition. Is there some kind of
--- Comonadic tree structure (zipper-like thing) that could
--- compose other Comonads? With Product and Sum, we could
--- certainly build a tree, maybe that would work.
+-- sub-component composition.
 type Component = Store S
 type Action = Co (Store S)
 
