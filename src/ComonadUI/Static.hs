@@ -2,13 +2,16 @@ module ComonadUI.Static where
 
 import Control.Comonad
 import Control.Comonad.Env
+import Control.Comonad.Identity
 import ComonadUI.Pairing
 
 
-runReader :: forall a r. r -> Co (Env r) a -> a
-runReader r w = runCo w (env r id)
+-- Static UI from Env e and Reader e
 
-emit :: Co (Env r) r
+runReader :: forall a r. r -> Co (Env r) a -> a
+runReader r m = runCo m (env r id)
+
+emit :: Co (Env r) r -- same as 'ask' in reader but there is already an ask for env
 emit = Co $ \w -> extract w (ask w)
 
 
@@ -25,5 +28,18 @@ e2 :: Element UI
 e2 = select emit (duplicate e1)
 
 
+-- Static UI from Identity as Comonad
+
+runId :: forall a. Co Identity a -> a
+runId m = runCo m (Identity id)
+
+type Element' = Identity
+type Emit' = Co Identity
+
+e1' :: Element' UI
+e1' = Identity "Static"
+
+e2' :: Element' UI
+e2' = select (pure ()) (duplicate e1')
 
 
